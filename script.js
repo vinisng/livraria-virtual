@@ -362,249 +362,47 @@ function initStripeModal() {
         }
     });
 
-    if (btnFinishSuccess) {
-        btnFinishSuccess.addEventListener('click', closeModal);
-    }
-
-    // Delegação de cliques em botões "Comprar"
-    document.addEventListener('click', function(e) {
-        const buyButton = e.target.closest('.buy-btn') || e.target.closest('[data-buy-id]');
-        if (buyButton) {
-            e.preventDefault();
-            const bookId = parseInt(buyButton.getAttribute('data-buy-id') || buyButton.closest('.book-card')?.getAttribute('data-id') || '1');
-            openCheckoutForBook(bookId);
-        }
+    // Close on link click
+    document.querySelectorAll('.nav-menu a').forEach(a => {
+        a.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+            document.body.classList.remove('menu-open');
+        });
     });
 
-    // Detecção e formatação de cartão
-    if (cardNumberInput) {
-        cardNumberInput.addEventListener('input', function(e) {
-            let val = e.target.value.replace(/\D/g, '').substring(0, 16);
-            let formatted = val.match(/.{1,4}/g)?.join(' ') || val;
-            e.target.value = formatted;
-
-            // Identificação de bandeira
-            let brand = 'Cartão';
-            if (/^4/.test(val)) brand = 'VISA';
-            else if (/^5[1-5]/.test(val) || /^2[2-7]/.test(val)) brand = 'MASTERCARD';
-            else if (/^3[47]/.test(val)) brand = 'AMEX';
-            else if (/^(4011|5067|4576|5041)/.test(val)) brand = 'ELO';
-
-            if (brandIndicator) {
-                brandIndicator.innerHTML = `<span class="card-brand-tag">${brand}</span>`;
-            }
-        });
-    }
-
-    // Formatação de validade MM/AA
-    if (cardExpInput) {
-        cardExpInput.addEventListener('input', function(e) {
-            let val = e.target.value.replace(/\D/g, '').substring(0, 4);
-            if (val.length >= 3) {
-                e.target.value = val.substring(0, 2) + '/' + val.substring(2);
-            } else {
-                e.target.value = val;
-            }
-        });
-    }
-
-    // Formatação de CVC
-    if (cardCvcInput) {
-        cardCvcInput.addEventListener('input', function(e) {
-            e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
-        });
-    }
-
-    // Formatação de CPF
-    if (cardCpfInput) {
-        cardCpfInput.addEventListener('input', function(e) {
-            let val = e.target.value.replace(/\D/g, '').substring(0, 11);
-            if (val.length > 9) {
-                e.target.value = val.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
-            } else if (val.length > 6) {
-                e.target.value = val.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
-            } else if (val.length > 3) {
-                e.target.value = val.replace(/(\d{3})(\d{1,3})/, '$1.$2');
-            } else {
-                e.target.value = val;
-            }
-        });
-    }
-
-    // Preenchimento de dados de teste Stripe (1 clique)
-    if (autofillTestBtn) {
-        autofillTestBtn.addEventListener('click', function() {
-            document.getElementById('customer-name').value = 'Gabriel Henrique';
-            document.getElementById('customer-email').value = 'cliente.teste@exemplo.com';
-            if (cardCpfInput) cardCpfInput.value = '123.456.789-00';
-            if (cardNumberInput) {
-                cardNumberInput.value = '4242 4242 4242 4242';
-                if (brandIndicator) brandIndicator.innerHTML = '<span class="card-brand-tag">VISA TEST</span>';
-            }
-            if (cardExpInput) cardExpInput.value = '12/28';
-            if (cardCvcInput) cardCvcInput.value = '123';
-        });
-    }
-
-    // Processamento do pagamento simulado via Stripe
-    if (paymentForm) {
-        paymentForm.addEventListener('submit', function(e) {
+    // Handle book purchase buttons
+    document.querySelectorAll('.buy-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
             e.preventDefault();
-
-            const formView = document.getElementById('checkout-form-view');
-            const processingView = document.getElementById('checkout-processing-view');
-            const successView = document.getElementById('checkout-success-view');
-
-            if (formView) formView.classList.add('hidden');
-            if (processingView) processingView.classList.remove('hidden');
-
-            // Simula latência realista do gateway Stripe (1.2 segundos)
-            setTimeout(() => {
-                const randomStripeId = 'ch_' + Math.random().toString(36).substring(2, 9) + Math.random().toString(36).substring(2, 9);
-                const customerEmail = document.getElementById('customer-email').value || 'cliente@exemplo.com';
-                const cardDigits = (cardNumberInput.value.replace(/\s/g, '').slice(-4)) || '4242';
-
-                // Atualiza o recibo
-                const receiptIdEl = document.getElementById('receipt-transaction-id');
-                const receiptBookEl = document.getElementById('receipt-book-title');
-                const receiptPriceEl = document.getElementById('receipt-total-price');
-                const receiptCardEl = document.getElementById('receipt-card-brand');
-                const receiptEmailEl = document.getElementById('receipt-email-target');
-
-                if (receiptIdEl) receiptIdEl.textContent = randomStripeId;
-                if (receiptBookEl && currentSelectedBook) receiptBookEl.textContent = currentSelectedBook.title;
-                if (receiptPriceEl && currentSelectedBook) receiptPriceEl.textContent = formatCurrency(currentSelectedBook.price);
-                if (receiptCardEl) receiptCardEl.textContent = `Cartão final ${cardDigits}`;
-                if (receiptEmailEl) receiptEmailEl.textContent = customerEmail;
-
-                if (processingView) processingView.classList.add('hidden');
-                if (successView) successView.classList.remove('hidden');
-            }, 1200);
+            
+            // Get book information from the card
+            const bookCard = this.closest('.book-card');
+            const title = bookCard.querySelector('h3').textContent.trim();
+            
+            // Extract author (everything before "R$")
+            const pElement = bookCard.querySelector('p');
+            const fullText = pElement.textContent;
+            const author = fullText.split('R$')[0].trim();
+            
+            // Get book cover image
+            const imgElement = bookCard.querySelector('.book-img img');
+            const coverImage = imgElement ? imgElement.src : '';
+            
+            console.log('Livro clicado:');
+            console.log('  Titulo:', title);
+            console.log('  Autor:', author);
+            console.log('  Capa:', coverImage);
+            
+            // Store in localStorage
+            localStorage.setItem('selectedBook', JSON.stringify({
+                title: title,
+                author: author,
+                coverImage: coverImage
+            }));
+            
+            // Redirect to book info page
+            window.location.href = 'book_info.html';
         });
-    }
-}
-
-// Abre o modal carregando os dados do livro correspondente
-function openCheckoutForBook(bookId) {
-    const modalOverlay = document.getElementById('stripe-modal');
-    if (!modalOverlay) return;
-
-    const book = BOOKS_DATABASE.find(b => b.id === bookId) || BOOKS_DATABASE[0];
-    currentSelectedBook = book;
-
-    // Preenche as informações no resumo do pedido
-    const modalImg = document.getElementById('modal-book-img');
-    const modalTitle = document.getElementById('modal-book-title');
-    const modalAuthor = document.getElementById('modal-book-author');
-    const modalCond = document.getElementById('modal-book-cond');
-    const subtotalEl = document.getElementById('modal-order-subtotal');
-    const totalEl = document.getElementById('modal-order-total');
-    const btnPayText = document.getElementById('btn-pay-amount');
-
-    if (modalImg) modalImg.src = book.image;
-    if (modalImg) modalImg.alt = book.title;
-    if (modalTitle) modalTitle.textContent = book.title;
-    if (modalAuthor) modalAuthor.textContent = book.author;
-    if (modalCond) modalCond.textContent = book.condition;
-    if (subtotalEl) subtotalEl.textContent = formatCurrency(book.price);
-    if (totalEl) totalEl.textContent = formatCurrency(book.price);
-    if (btnPayText) btnPayText.textContent = `Pagar ${formatCurrency(book.price)}`;
-
-    resetModalViews();
-
-    modalOverlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function resetModalViews() {
-    const formView = document.getElementById('checkout-form-view');
-    const processingView = document.getElementById('checkout-processing-view');
-    const successView = document.getElementById('checkout-success-view');
-
-    if (formView) formView.classList.remove('hidden');
-    if (processingView) processingView.classList.add('hidden');
-    if (successView) successView.classList.add('hidden');
-}
-
-// ==========================================================================
-// 4. FORMULÁRIO "QUERO VENDER" COM FEEDBACK PROFISSIONAL
-// ==========================================================================
-function initSellForm() {
-    const sellForm = document.getElementById('vender-form');
-    const sellAlert = document.getElementById('vender-success-alert');
-
-    if (sellForm) {
-        sellForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            if (sellAlert) {
-                sellAlert.classList.add('success');
-                sellAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-
-            sellForm.reset();
-
-            setTimeout(() => {
-                if (sellAlert) sellAlert.classList.remove('success');
-            }, 6000);
-        });
-    }
-}
-
-// ==========================================================================
-// 5. PÁGINA DE DETALHES DO LIVRO (book_info.html)
-// ==========================================================================
-function initBookDetailsPage() {
-    const detailsRoot = document.getElementById('book-details-root');
-    if (!detailsRoot) return;
-
-    // Obtém o parâmetro id da URL (ex: book_info.html?id=3)
-    const urlParams = new URLSearchParams(window.location.search);
-    const bookId = parseInt(urlParams.get('id') || '1');
-    const book = BOOKS_DATABASE.find(b => b.id === bookId) || BOOKS_DATABASE[0];
-
-    // Atualiza o título da aba do navegador
-    document.title = `${book.title} - Livraria Virtual`;
-
-    // Atualiza os campos de detalhes
-    const breadcrumbTitle = document.getElementById('details-breadcrumb-title');
-    const coverImg = document.getElementById('details-cover-img');
-    const titleEl = document.getElementById('details-title');
-    const authorEl = document.getElementById('details-author');
-    const categoryTag = document.getElementById('details-category-tag');
-    const conditionTag = document.getElementById('details-condition-tag');
-    const priceEl = document.getElementById('details-price');
-    const descEl = document.getElementById('details-description');
-    const buyBtn = document.getElementById('details-buy-btn');
-
-    // Metadados da tabela
-    const specPublisher = document.getElementById('spec-publisher');
-    const specPages = document.getElementById('spec-pages');
-    const specYear = document.getElementById('spec-year');
-    const specCond = document.getElementById('spec-condition');
-
-    if (breadcrumbTitle) breadcrumbTitle.textContent = book.title;
-    if (coverImg) {
-        coverImg.src = book.image;
-        coverImg.alt = `Capa do livro ${book.title}`;
-    }
-    if (titleEl) titleEl.textContent = book.title;
-    if (authorEl) authorEl.textContent = `Por ${book.author}`;
-    if (categoryTag) categoryTag.textContent = book.category;
-    if (conditionTag) conditionTag.textContent = book.condition;
-    if (priceEl) priceEl.textContent = formatCurrency(book.price);
-    if (descEl) descEl.textContent = book.description;
-
-    if (specPublisher) specPublisher.textContent = book.publisher;
-    if (specPages) specPages.textContent = `${book.pages} páginas`;
-    if (specYear) specYear.textContent = book.year;
-    if (specCond) specCond.textContent = book.condition;
-
-    if (buyBtn) {
-        buyBtn.setAttribute('data-buy-id', book.id);
-        buyBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            openCheckoutForBook(book.id);
-        });
-    }
-}
+    });
+});

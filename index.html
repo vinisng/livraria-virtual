@@ -3,38 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Versus — Livros Novos e Seminovos</title>
-    <link rel="icon" type="image/jpeg" href="Logo.jpeg">
+    <title>Versus Livraria</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
 <body>
-
-    <!-- Cabeçalho Principal -->
-    <header class="header-wrapper">
-        <div class="menu">
-            <a href="#home" class="brand-link" aria-label="Página inicial da Livraria Virtual">
-                <img class="logo" src="Logo.jpeg" alt="Logo da Livraria Virtual">
-                <span class="titulo">Versus</span>
-            </a>
-
-            <nav aria-label="Navegação principal">
-                <ul class="nav-menu">
-                    <li><a href="#home">Início</a></li>
-                    <li><a href="#catalogo">Catálogo</a></li>
-                    <li><a href="#vender">Quero Vender</a></li>
-                    <li><a href="#avaliacoes">Avaliações</a></li>
-                    <li><a href="#vender" class="btn-nav-action">Anunciar Livro</a></li>
-                </ul>
-            </nav>
-
-            <button class="hamburger" aria-label="Alternar navegação" type="button">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </div>
-    </header>
+    <div class="menu">
+        <img class="logo" src="Logo.jpeg" alt="Logo da Livraria Virtual" class="logo">
+        <h1 class="titulo">Versus</h1>
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#servicos">Serviços</a></li>
+                <li><a href="#sobre">Sobre</a></li>
+                <li><a href="#agenda" class="btn-agendar">Agendar Consulta</a></li>
+            </ul>
+        </nav>
+        <button class="hamburger" aria-label="Toggle Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
 
     <main>
         <!-- Seção Hero -->
@@ -607,50 +597,7 @@
     <!-- Rodapé -->
     <footer>
         <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <a href="#home" class="brand-link">
-                        <img class="logo" src="Logo.jpeg" alt="Logo da Livraria Virtual">
-                        <span class="titulo">Livraria Virtual</span>
-                    </a>
-                    <p>Conectando leitores a grandes histórias com compromisso, sustentabilidade e preços acessíveis.</p>
-                </div>
-
-                <div class="footer-col">
-                    <h4>Navegação</h4>
-                    <ul class="footer-links">
-                        <li><a href="#home">Início</a></li>
-                        <li><a href="#catalogo">Catálogo</a></li>
-                        <li><a href="#vender">Quero Vender</a></li>
-                        <li><a href="#avaliacoes">Avaliações</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4>Categorias</h4>
-                    <ul class="footer-links">
-                        <li><a href="#catalogo">Literatura Brasileira</a></li>
-                        <li><a href="#catalogo">Literatura Internacional</a></li>
-                        <li><a href="#catalogo">Romance</a></li>
-                        <li><a href="#catalogo">Suspense e Mistério</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <div class="stripe-footer-badge">
-                        <div class="stripe-header-row">
-                            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                            <span>Pagamento via Stripe</span>
-                        </div>
-                        <p>Plataforma equipada com checkout integrado e proteção de dados em conformidade com o padrão PCI-DSS Nível 1.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p>&copy; 2026 Livraria Virtual. Todos os direitos reservados.</p>
-                <p>Termos de Uso &bull; Política de Privacidade &bull; Segurança de Pagamentos</p>
-            </div>
+            <p>&copy; 2026 Versus. Todos os direitos reservados.</p>
         </div>
     </footer>
 
